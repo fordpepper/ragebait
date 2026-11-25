@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>gus</title>
+<meta name="description" content="a tiny ai that runs in your browser and exists only to annoy you">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>😏</text></svg>">
+<link rel="stylesheet" href="style.css">
+<script src="coi.js"></script>
+</head>
+<body>
+<main class="app">
+  <header class="top">
+    <div class="avatar" aria-hidden="true">😏</div>
+    <div class="who">
+      <h1>gus</h1>
+      <p id="status">waking up, unfortunately</p>
+    </div>
+  </header>
+
+  <section id="loader" class="loader">
+    <p class="loader-line" id="loaderLine">downloading gus's brain. it's small. like, really small.</p>
+    <div class="bar"><div id="barFill"></div></div>
+    <p class="loader-sub" id="loaderSub">first visit only. after that he lives in your browser and works offline.</p>
+  </section>
+
+  <section id="chat" class="chat" aria-live="polite"></section>
+
+  <form id="form" class="composer" autocomplete="off">
+    <input id="input" type="text" placeholder="say something. he'll hate it." maxlength="300" disabled>
+    <button id="send" type="submit" disabled aria-label="send">↑</button>
+  </form>
+</main>
+<script type="module" src="app.js"></script>
+</body>
+</html>

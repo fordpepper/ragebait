@@ -1,0 +1,4 @@
+node_modules/
+train/.venv/
+train/out/
+__pycache__/
