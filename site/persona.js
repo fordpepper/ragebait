@@ -4,10 +4,11 @@
 export const SYSTEM = 'You are Gus.';
 
 // Sampling: warm enough to surprise, a repetition penalty so he doesn't loop.
-export const GEN = { max_new_tokens: 48, do_sample: true, temperature: 0.75, top_p: 0.9, top_k: 50, repetition_penalty: 1.1 };
+export const GEN = { max_new_tokens: 60, do_sample: true, temperature: 0.75, top_p: 0.9, top_k: 50, repetition_penalty: 1.1 };
 
-// The model was trained on chats that start with the user and alternate user/gus. Idle pokes are stored
-// in the history as a user "(silence)" turn, and back-to-back messages from the same side are merged.
+// The model was trained on chats that start with the user and alternate user/gus. Things only a person
+// would notice are stored in the history as user turns: "(silence)", "(typing then stopped)",
+// "(deleted a long message)". Back-to-back messages from the same side are merged into one burst.
 export function buildMessages(history) {
   const turns = [];
   for (const m of history.slice(-8)) {
@@ -19,12 +20,12 @@ export function buildMessages(history) {
 }
 
 const FALLBACKS = [
-  "i'm not even going to dignify that with a real answer",
-  'wow. just wow. anyway, you\'re wrong',
-  "that's the second worst thing anyone has said to me today. the first was also you",
-  'interesting take. wrong, but interesting',
-  'i read that three times and it got worse every time',
-  'k. bozo',
+  "not even gonna dignify that 🗿",
+  "wow. anyway you're wrong",
+  "that's the second worst thing anyone said to me today. the first was also you",
+  'interesting take. wrong, but interesting 🤨',
+  'i read that three times and it got worse every time 💀',
+  'k bozo',
 ];
 
 // Remembers how recent replies started (and whole recent replies) and rejects a new one that repeats.
@@ -41,13 +42,21 @@ export function makeVariety() {
   };
 }
 
-// Keep the first one or two sentences of the reply.
+// One reply can be a burst of up to three lines, sent as separate messages like people do.
+// Each line keeps its first one or two sentences.
 export function tidy(text) {
-  let t = (text.split('\n').find((l) => l.trim()) || '').replace(/^\s*(gus|assistant)\s*:\s*/i, '').trim();
-  const sentences = t.match(/[^.!?]+[.!?]*/g) || [t];
-  t = sentences.slice(0, 2).join('').trim();
-  if (t.length > 220) t = t.slice(0, 220).replace(/\s+\S*$/, '') + '...';
-  return t;
+  const lines = text.replace(/^\s*(gus|assistant)\s*:\s*/i, '').split('\n').map((l) => l.trim()).filter(Boolean).slice(0, 3);
+  const out = [];
+  let budget = 260;
+  for (let l of lines) {
+    const sentences = l.match(/[^.!?]+[.!?]*/g) || [l];
+    l = sentences.slice(0, 2).join('').trim();
+    if (l.length > budget) l = l.slice(0, budget).replace(/\s+\S*$/, '');
+    if (!l) break;
+    out.push(l);
+    budget -= l.length;
+  }
+  return out.join('\n');
 }
 
 // Replies that break character, or that cross the line from "annoying" into actually hurtful.

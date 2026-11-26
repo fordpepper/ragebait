@@ -34,3 +34,12 @@ Sources: NPR / OUP on the Word of the Year; RNZ "Rage-baiting: how content creat
 anger"; RTÉ "What is rage bait"; gathered.how "7 types of rage bait"; knowyourmeme.com "Rage Bait";
 dictionary.com "L + ratio". TikTok, Instagram and YouTube pages themselves couldn't be read by the
 fetcher (JavaScript-only), so the video formats come from the articles and Shorts titles above.
+
+## Emojis (v3)
+
+Gus uses emojis the way they're used in comments now, and only when they fit what he's saying.
+😭 was the most used emoji of 2025 (Meltwater) and now means laughing or mock-crying. 💀 means "i'm dead",
+i.e. something's funny. 🙂 and 👍 read as passive-aggressive, which suits him, and 🗿 is deadpan. Odd ones show
+up when the topic calls for them: 🐟 for fish or a smell, 🦶 for feet or walking, 🥦 for vegetables. 😂 is treated
+as the "mom emoji": he makes fun of you for using it. Sources: Meltwater "Top emojis 2025", dictionary.com
+"How Gen Z uses emoji", Axios "How to use emojis like Gen Z" (Aug 2025).

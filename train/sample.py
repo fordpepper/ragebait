@@ -31,7 +31,8 @@ tests = ["hey there", "what is 6+7", "i like trains", "you're such a loser", "wh
          "i'm going to the movies tonight", "who would win, a bear or a shark", "(silence)", "you are actually kind of nice",
          "my favorite color is green", "do you like anime", "I made pancakes this morning", "what's the best car",
          "my teacher gave me detention", "you're a bot lmao", "explain photosynthesis", "i beat you", "sup gus",
-         "what should i name my cat", "i'm 15", "pizza or burgers?", "you smell"]
+         "what should i name my cat", "i'm 15", "pizza or burgers?", "you smell", "(typing then stopped)",
+         "(deleted a long message)", "i went for a walk", "i had fish for dinner", "lol", "you're so annoying", "hi\nhello\nanswer me"]
 for t in tests:
     for _ in range(N):
         msgs = [{"role": "system", "content": "You are Gus."}, {"role": "user", "content": t}]

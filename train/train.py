@@ -21,7 +21,7 @@ LORA = "--lora" in sys.argv
 QAT = "--qat" in sys.argv
 QBLOCK = 32
 SYSTEM = "You are Gus."
-WEIGHT = {"data_d.txt": 2, "data_e.txt": 2, "data_f.txt": 2}
+WEIGHT = {"data_d.txt": 2, "data_e.txt": 2, "data_f.txt": 2, "data_g.txt": 3, "data_h.txt": 3}
 here = pathlib.Path(__file__).parent
 torch.manual_seed(0); random.seed(0)
 torch.set_num_threads(12)
@@ -40,10 +40,40 @@ def load_convos():
                 cur.append({"role": "user", "content": line[2:].strip()})
             elif line.startswith("< "):
                 cur.append({"role": "assistant", "content": line[2:].strip()})
+            elif cur:
+                cur[-1]["content"] += "\n" + line.strip()   # a burst of several messages in a row
         for c in found:
             assert c[0]["role"] == "user" and all(a["role"] != b["role"] for a, b in zip(c, c[1:])), (f.name, c)
+        if f.name == "data_t.txt":
+            found = random.sample(found, len(found) // 2)   # templates: half is plenty, they repeat by design
         convos += [(c, f.name != "data_t.txt") for c in found] * WEIGHT.get(f.name, 1)
     return convos
+
+
+# Older data files have no emojis. Give some of those replies one that fits what the reply is about,
+# so the model learns emojis follow the topic (never random, and most replies get none).
+EMOJI_RULES = [
+    (r"ragebait|too easy|fell for", "💀🤣😭"), (r"\bcry|crying|tears", "😭"), (r"\bratio\b|\bL\b|\blost\b|losing", "💀🫵"),
+    (r"bozo|clown", "🤡"), (r"\bnpc\b", "🗿🧍"), (r"erm actually|nerd|dictionary|look it up|google", "🤓"),
+    (r"nobody asked|who asked|didn't ask", "🤨"), (r"bored|boring|sleep|nap", "🥱"), (r"\bsad\b|tragic|lonely", "😔💔"),
+    (r"\bew\b|gross|disgusting", "🤢"), (r"pizza|pasta|fries|burger|toast|cake|cookie|snack|sandwich|tacos?\b|cereal|soup", "🤤🤢"),
+    (r"\bfish|smell", "🐟"), (r"\bfeet\b|\bfoot\b|socks?\b|\btoes?\b|walk|running|\bran\b|shoes", "🦶"),
+    (r"vegetable|salad|broccoli|healthy|veggie", "🥦"), (r"grass|outside", "🌳"), (r"breaking:", "🚨"),
+    (r"moon|space|stars\b|planet", "🌚"), (r"goose|geese|duck|bird", "🪿"), (r"money|rich|\bjob\b|paid|robux", "💸"),
+    (r"congrats|proud of you|good for you|cool\.|sure\.|okay\.", "🙂👍"), (r"\bwin\b|winning|undefeated", "🏆"),
+    (r"\byou\b.*\b(wrong|problem|reason)\b", "🫵"), (r"wrong|correct|\bright\b", "🤨"), (r"\bdog\b|\bdogs\b", "🐕"),
+    (r"\bcat\b|\bcats\b", "🐈"), (r"love|crush|date\b|girlfriend|boyfriend", "💔"), (r"music|song|sing", "🎶"),
+]
+
+
+def add_emoji(text):
+    if any(ord(ch) > 0x2500 for ch in text) or random.random() > 0.35:
+        return text
+    low = text.lower()
+    for pat, choices in EMOJI_RULES:
+        if re.search(pat, low):
+            return text.rstrip(".") + " " + random.choice(list(choices.replace("\ufe0f", "")) if len(choices) > 1 else [choices])
+    return text
 
 
 def messy(text):
@@ -120,10 +150,11 @@ loaded = load_convos()
 convos = [c for c, _ in loaded]
 # generated chats (data_t) are varied already; only the handwritten ones get a messy-typing copy
 convos += [[dict(m, content=messy(m["content"])) if m["role"] == "user" else m for m in c] for c, aug in loaded if aug]
+convos = [[dict(m, content=add_emoji(m["content"])) if m["role"] == "assistant" else m for m in c] for c in convos]
 print(len(convos), "conversations,", sum(1 for c in convos for m in c if m["role"] == "assistant"), "replies (incl. repeats)")
 data = [encode(c) for c in convos]
 params = [p for p in model.parameters() if p.requires_grad]
-LR = 2e-4 if LORA else 2e-5 if QAT else 6e-5
+LR = 2e-4 if LORA else 2e-5 if QAT else 4e-5
 opt = torch.optim.AdamW(params, lr=LR, weight_decay=0.01)
 BATCH = 16
 steps = EPOCHS * ((len(data) + BATCH - 1) // BATCH)
@@ -131,11 +162,21 @@ sched = torch.optim.lr_scheduler.OneCycleLR(opt, max_lr=LR, total_steps=steps, p
 model.train()
 step = 0
 pad = tok.pad_token_id if tok.pad_token_id is not None else 0
+def batches():
+    """Shuffled batches of similar length (much less padding, so much faster on CPU)."""
+    order = data[:]
+    random.shuffle(order)
+    out = []
+    for g in range(0, len(order), BATCH * 32):
+        group = sorted(order[g:g + BATCH * 32], key=lambda d: len(d[0]))
+        out += [group[i:i + BATCH] for i in range(0, len(group), BATCH)]
+    random.shuffle(out)
+    return out
+
+
 for ep in range(EPOCHS):
-    random.shuffle(data)
     tot = 0.0
-    for i in range(0, len(data), BATCH):
-        batch = data[i:i + BATCH]
+    for batch in batches():
         L = max(len(x) for x, _ in batch)
         ids = torch.stack([torch.cat([x, torch.full((L - len(x),), pad)]) for x, _ in batch])
         lab = torch.stack([torch.cat([y, torch.full((L - len(y),), -100)]) for _, y in batch])

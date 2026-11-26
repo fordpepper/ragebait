@@ -1,8 +1,0 @@
-{
- "config.json": 873,
- "generation_config.json": 132,
- "onnx/model_q4.onnx": 87566935,
- "special_tokens_map.json": 655,
- "tokenizer.json": 3522656,
- "tokenizer_config.json": 3793
-}

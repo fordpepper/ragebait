@@ -1,0 +1,17 @@
+{
+ "files": {
+  "config.json": 858,
+  "generation_config.json": 132,
+  "onnx/model_q4.onnx": 233361793,
+  "special_tokens_map.json": 655,
+  "tokenizer.json": 3522656,
+  "tokenizer_config.json": 3793
+ },
+ "parts": {
+  "onnx/model_q4.onnx": [
+   "onnx/model_q4.onnx.part00",
+   "onnx/model_q4.onnx.part01",
+   "onnx/model_q4.onnx.part02"
+  ]
+ }
+}

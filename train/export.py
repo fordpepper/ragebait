@@ -3,7 +3,7 @@
 usage: .venv/bin/python export.py out/gus ../site/models/gus [block_size]
 
 - Every MatMul (including the output head) becomes an asymmetric 4-bit MatMulNBits (blocks of 32),
-  the same rounding train.py --qat trains against.
+  the same rounding train.py --qat trains against. Files over 90 MB are split into parts (see files.json).
 - The input embedding table is not stored at all: the output head holds the same matrix,
   so the embedding lookup reads rows straight out of the head's 4-bit weights and unpacks
   them with plain integer ops (onnxruntime-web has no 4-bit Gather kernel).
@@ -169,9 +169,25 @@ tc = json.loads((dst / "tokenizer_config.json").read_text())
 if "chat_template" not in tc and (tmp / "chat_template.jinja").exists():
     tc["chat_template"] = (tmp / "chat_template.jinja").read_text()
     (dst / "tokenizer_config.json").write_text(json.dumps(tc, indent=2))
-# real (uncompressed) sizes for the page's progress bar; GitHub Pages sends files gzipped
-sizes = {f.relative_to(dst).as_posix(): f.stat().st_size for f in sorted(dst.rglob("*")) if f.is_file() and f.name != "files.json"}
-(dst / "files.json").write_text(json.dumps(sizes, indent=1) + "\n")
-mb = out.stat().st_size / 1e6
-print("wrote", out, f"{mb:.1f} MB")
-assert out.stat().st_size < 95 * 1024 * 1024, "model is over the 95 MB budget (GitHub's per-file limit is 100 MB)"
+# files.json: the real (uncompressed) size of every file, for the page's progress bar (GitHub Pages sends
+# files gzipped), and the parts of any file over GitHub's 100 MB limit, which the page streams back together.
+PART = 90 * 1024 * 1024
+manifest = {"files": {}, "parts": {}}
+for f in sorted(dst.rglob("*")):
+    if not f.is_file() or f.name == "files.json":
+        continue
+    rel = f.relative_to(dst).as_posix()
+    manifest["files"][rel] = f.stat().st_size
+    if f.stat().st_size > PART:
+        names = []
+        with f.open("rb") as fh:
+            while chunk := fh.read(PART):
+                part = f.with_name(f"{f.name}.part{len(names):02d}")
+                part.write_bytes(chunk)
+                names.append(part.relative_to(dst).as_posix())
+        f.unlink()
+        manifest["parts"][rel] = names
+(dst / "files.json").write_text(json.dumps(manifest, indent=1) + "\n")
+total = sum(manifest["files"].values())
+print(f"wrote {dst}: model {manifest['files']['onnx/model_q4.onnx'] / 1e6:.1f} MB, all files {total / 1e6:.1f} MB,",
+      f"{sum(len(v) for v in manifest['parts'].values())} parts")

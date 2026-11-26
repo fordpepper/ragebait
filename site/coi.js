@@ -3,7 +3,7 @@
 //    Threads make Gus reply much faster on CPU. The page reloads once, the first time, to switch them on.
 // 2. It keeps a copy of the page's own files so Gus opens offline. (The model itself is cached by
 //    transformers.js in its own cache, so it is not copied twice.)
-const SHELL = 'gus-shell-v2';
+const SHELL = 'gus-shell-v3';
 
 if (typeof window === 'undefined') {
   self.addEventListener('install', () => self.skipWaiting());
