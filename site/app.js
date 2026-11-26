@@ -1,7 +1,10 @@
+import { CRISIS, CRISIS_REPLY } from './persona.js';
+import { DOWNLOAD_MB } from './config.js';
+
 const $ = (id) => document.getElementById(id);
 const chat = $('chat'), input = $('input'), send = $('send'), status = $('status');
 const history = [];
-let pending = 0, nextId = 1, idleTimer = 0, idlePokes = 0;
+let pending = 0, nextId = 1, idleTimer = 0, idlePokes = 0, ready = false;
 
 const worker = new Worker(new URL('./worker.js', import.meta.url), { type: 'module' });
 
@@ -11,16 +14,23 @@ const LOADER_LINES = [
   'still loading. he wants you to know he could load faster if he wanted to.',
   "almost there. he's already thought of three things wrong with you.",
 ];
-const STATUSES = ['online, unfortunately', 'online and correct', 'right about everything', 'ignoring you (not really)', 'online. obviously.'];
-let loaderStep = 0;
-const loaderTimer = setInterval(() => { $('loaderLine').textContent = LOADER_LINES[++loaderStep % LOADER_LINES.length]; }, 5000);
+const STATUSES = ['online, unfortunately', 'online and correct', 'right about everything', 'ignoring you (not really)', 'online. obviously.', 'judging you'];
+let loaderStep = 0, loaderTimer = 0;
 
 worker.onmessage = ({ data }) => {
-  if (data.type === 'progress') {
+  if (data.type === 'checked') {
+    // On mobile data or data saver, ask before the one-time download.
+    const c = navigator.connection;
+    const metered = c && (c.saveData || c.type === 'cellular' || /(^|-)2g|3g/.test(c.effectiveType || ''));
+    if (!data.cached && metered) askToDownload();
+    else startLoading();
+  } else if (data.type === 'progress') {
     const pct = Math.min(100, (data.loaded / data.total) * 100);
     $('barFill').style.width = pct.toFixed(1) + '%';
-    $('loaderSub').textContent = `${(data.loaded / 1e6).toFixed(0)} / ${(data.total / 1e6).toFixed(0)} MB, first visit only. after that it's cached and works offline.`;
+    $('loaderSub').textContent = `${Math.min(data.loaded, data.total) / 1e6 | 0} / ${data.total / 1e6 | 0} MB. first visit only, after that he's saved and works offline.`;
   } else if (data.type === 'ready') {
+    ready = true;
+    document.body.dataset.device = data.device;   // webgpu or wasm, handy when debugging
     clearInterval(loaderTimer);
     $('loader').hidden = true;
     chat.hidden = false;
@@ -42,8 +52,28 @@ worker.onmessage = ({ data }) => {
     $('loaderSub').textContent = data.message;
   }
 };
+
+function askToDownload() {
+  $('loaderLine').textContent = "you're on mobile data. gus is a one-time download, then he lives in your browser.";
+  $('loaderSub').textContent = '';
+  const btn = $('download');
+  btn.textContent = `download gus (about ${DOWNLOAD_MB} MB)`;
+  btn.hidden = false;
+  btn.onclick = () => { btn.hidden = true; startLoading(); };
+}
+
+function startLoading() {
+  $('loaderLine').textContent = LOADER_LINES[0];
+  $('loaderSub').textContent = `about ${DOWNLOAD_MB} MB, first visit only. after that he's saved and works offline.`;
+  loaderTimer = setInterval(() => { $('loaderLine').textContent = LOADER_LINES[++loaderStep % LOADER_LINES.length]; }, 5000);
+  worker.postMessage({ type: 'load', gpu: new URLSearchParams(location.search).has('gpu') });
+}
+
 chat.hidden = true;
-worker.postMessage({ type: 'load' });
+// coi.js may be about to reload the page once to switch on multi-threading; don't start a download it would cut off.
+const coi = window.__coiReload;
+(coi ? Promise.race([coi, new Promise((r) => setTimeout(r, 4000))]) : Promise.resolve())
+  .then(() => worker.postMessage({ type: 'check' }));
 
 function setStatus() {
   status.classList.toggle('typing', pending > 0);
@@ -64,7 +94,6 @@ function showTyping() {
   const el = document.createElement('div');
   el.className = 'msg gus typing-bubble';
   el.innerHTML = '<span class="dots"><i></i><i></i><i></i></span>';
-  el.style.padding = '0';
   chat.append(el);
   chat.scrollTop = chat.scrollHeight;
 }
@@ -91,11 +120,17 @@ function armIdle() {
 $('form').addEventListener('submit', (e) => {
   e.preventDefault();
   const text = input.value.trim();
-  if (!text) return;
+  if (!text || !ready) return;
   input.value = '';
   addMsg('me', text);
+  clearTimeout(idleTimer);
+  if (CRISIS.test(text)) {
+    // Not a bit. Answer straight, keep it out of his memory, and no pokes.
+    addMsg('gus care', CRISIS_REPLY);
+    idlePokes = 2;
+    return;
+  }
   history.push({ role: 'user', content: text });
   idlePokes = 0;
-  clearTimeout(idleTimer);
   ask();
 });

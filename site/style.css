@@ -45,6 +45,11 @@ body {
 .loader-sub { color: var(--dim); font-size: 13px; margin: 14px 0 0; }
 .bar { height: 8px; border-radius: 99px; background: var(--line); overflow: hidden; }
 #barFill { height: 100%; width: 0; background: var(--gus); transition: width .3s; }
+.download {
+  margin-top: 18px; padding: 12px 20px; border: 0; border-radius: 99px;
+  background: var(--gus); color: var(--gus-ink); font: inherit; font-weight: 700; cursor: pointer;
+}
+.download[hidden] { display: none; }
 .loader.err .loader-line { color: #ff8a80; }
 
 .chat {
@@ -66,6 +71,8 @@ body {
 .msg.me { align-self: flex-end; background: var(--me); border-bottom-right-radius: 5px; }
 .msg.gus { align-self: flex-start; background: var(--gus); color: var(--gus-ink); border-bottom-left-radius: 5px; }
 .msg.me + .msg.gus, .msg.gus + .msg.me { margin-top: 8px; }
+.typing-bubble { padding: 0; }
+.msg.care { background: var(--ink); color: var(--bg); }
 .dots { display: inline-flex; gap: 4px; padding: 13px 15px; }
 .dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--gus-ink); opacity: .35; animation: blink 1s infinite; }
 .dots i:nth-child(2) { animation-delay: .15s; }
