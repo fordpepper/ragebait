@@ -101,9 +101,11 @@ function removeTyping() { chat.querySelector('.typing-bubble')?.remove(); }
 
 function ask({ idle = false } = {}) {
   pending++;
+  // He was trained to answer "(silence)" with an unprompted jab.
+  if (idle) history.push({ role: 'user', content: '(silence)' });
   // A short "read it, sigh, start typing" pause feels more human (and more annoying).
   setTimeout(() => { if (pending) { showTyping(); setStatus(); } }, 400 + Math.random() * 900);
-  worker.postMessage({ type: 'reply', id: nextId++, history: history.slice(-6), idle });
+  worker.postMessage({ type: 'reply', id: nextId++, history: history.slice(-8) });
 }
 
 // Go quiet and he pokes you, a couple of times, then sulks until you talk again.

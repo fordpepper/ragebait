@@ -4,17 +4,18 @@
 export const SYSTEM = 'You are Gus.';
 
 // Sampling: warm enough to surprise, a repetition penalty so he doesn't loop.
-export const GEN = { max_new_tokens: 48, do_sample: true, temperature: 0.8, top_p: 0.9, top_k: 50, repetition_penalty: 1.1 };
+export const GEN = { max_new_tokens: 48, do_sample: true, temperature: 0.75, top_p: 0.9, top_k: 50, repetition_penalty: 1.1 };
 
-export function buildMessages(history, { idle } = {}) {
-  const msgs = [{ role: 'system', content: SYSTEM }];
-  for (const m of history.slice(-6)) msgs.push({ role: m.role, content: m.content });
-  // An idle poke is trained as a reply to "(silence)"; never send two user turns in a row.
-  if (idle) {
-    if (msgs.at(-1).role === 'user') msgs.pop();
-    msgs.push({ role: 'user', content: '(silence)' });
+// The model was trained on chats that start with the user and alternate user/gus. Idle pokes are stored
+// in the history as a user "(silence)" turn, and back-to-back messages from the same side are merged.
+export function buildMessages(history) {
+  const turns = [];
+  for (const m of history.slice(-8)) {
+    if (turns.length && turns.at(-1).role === m.role) turns.at(-1).content += '\n' + m.content;
+    else turns.push({ role: m.role, content: m.content });
   }
-  return msgs;
+  while (turns.length && turns[0].role !== 'user') turns.shift();
+  return [{ role: 'system', content: SYSTEM }, ...turns];
 }
 
 const FALLBACKS = [

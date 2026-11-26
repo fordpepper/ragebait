@@ -67,10 +67,10 @@ async function load(preferGpu) {
   postMessage({ type: 'ready', device });
 }
 
-async function reply(history, idle) {
+async function reply(history) {
   let best = '';
   for (let tries = 0; tries < 4; tries++) {
-    const out = await gen(buildMessages(history, { idle }), GEN);
+    const out = await gen(buildMessages(history), GEN);
     const text = tidy(out[0].generated_text.at(-1).content);
     if (looksBroken(text)) continue;
     if (!best) best = text;
@@ -87,7 +87,7 @@ onmessage = ({ data: msg }) => {
   if (msg.type === 'load') load(msg.gpu).catch((err) => postMessage({ type: 'error', message: String(err?.message || err) }));
   if (msg.type === 'reply') {
     queue = queue.then(async () => {
-      try { postMessage({ type: 'reply', id: msg.id, text: await reply(msg.history, msg.idle) }); }
+      try { postMessage({ type: 'reply', id: msg.id, text: await reply(msg.history) }); }
       catch (err) { postMessage({ type: 'reply', id: msg.id, text: variety.fallback(), error: String(err?.message || err) }); }
     });
   }
