@@ -5,137 +5,50 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>gus</title>
 <meta name="description" content="a tiny ai that lives in your browser and exists only to annoy you">
-<meta name="theme-color" content="#1e1f22">
+<meta name="theme-color" content="#313338">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="stylesheet" href="style.css">
 <script src="coi.js"></script>
 </head>
 <body>
-<svg class="sprite" aria-hidden="true">
-  <symbol id="i-chat" viewBox="0 0 24 24"><path fill="currentColor" d="M4 4h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9l-5 4v-4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></symbol>
-  <symbol id="i-people" viewBox="0 0 24 24"><path fill="currentColor" d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm7 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM2 20c0-3.3 3.1-6 7-6s7 2.7 7 6v1H2v-1zm15.5 1v-1c0-1.9-.7-3.6-1.9-4.9 3.4.1 6.4 2.2 6.4 5v.9h-4.5z"/></symbol>
-  <symbol id="i-plus" viewBox="0 0 24 24"><path fill="currentColor" d="M13 5h-2v6H5v2h6v6h2v-6h6v-2h-6z"/></symbol>
-  <symbol id="i-at" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 1 0 5.2 18.5l-1-1.7A8 8 0 1 1 20 12v1.2a1.8 1.8 0 0 1-3.6 0V7h-1.9v.9A5 5 0 1 0 15 16a3.8 3.8 0 0 0 7-2.8V12A10 10 0 0 0 12 2zm0 13a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></symbol>
-  <symbol id="i-phone" viewBox="0 0 24 24"><path fill="currentColor" d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></symbol>
-  <symbol id="i-video" viewBox="0 0 24 24"><path fill="currentColor" d="M4 6h11a2 2 0 0 1 2 2v1.5l4-2.5v10l-4-2.5V16a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z"/></symbol>
-  <symbol id="i-pin" viewBox="0 0 24 24"><path fill="currentColor" d="M16 3l5 5-2 1-3 3 .5 4.5-1.5 1.5-4-4-5 5H5v-1l5-5-4-4 1.5-1.5L12 8l3-3z"/></symbol>
-  <symbol id="i-profile" viewBox="0 0 24 24"><path fill="currentColor" d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9zm0 2c-4.4 0-8 2.2-8 5v2h16v-2c0-2.8-3.6-5-8-5z"/></symbol>
-  <symbol id="i-menu" viewBox="0 0 24 24"><path fill="currentColor" d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></symbol>
-  <symbol id="i-mic" viewBox="0 0 24 24"><path fill="currentColor" d="M12 15a3.5 3.5 0 0 0 3.5-3.5v-6a3.5 3.5 0 0 0-7 0v6A3.5 3.5 0 0 0 12 15zm6-3.5h-1.8a4.2 4.2 0 0 1-8.4 0H6a6 6 0 0 0 5 5.9V21h2v-3.6a6 6 0 0 0 5-5.9z"/></symbol>
-  <symbol id="i-headset" viewBox="0 0 24 24"><path fill="currentColor" d="M12 3a9 9 0 0 0-9 9v6a3 3 0 0 0 3 3h2v-8H5v-1a7 7 0 0 1 14 0v1h-3v8h2a3 3 0 0 0 3-3v-6a9 9 0 0 0-9-9z"/></symbol>
-  <symbol id="i-gear" viewBox="0 0 24 24"><path fill="currentColor" d="M19.4 13a7.6 7.6 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.6 7.6 0 0 0-1.7-1L15 3h-4l-.4 2.6a7.6 7.6 0 0 0-1.7 1l-2.5-1-2 3.5L6.6 11a7.6 7.6 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1a7.6 7.6 0 0 0 1.7 1L11 21h4l.4-2.6a7.6 7.6 0 0 0 1.7-1l2.5 1 2-3.5zM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></symbol>
-  <symbol id="i-smile" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM8.5 8.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm7 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zM12 18a6 6 0 0 1-5.2-3h10.4A6 6 0 0 1 12 18z"/></symbol>
-  <symbol id="i-gift" viewBox="0 0 24 24"><path fill="currentColor" d="M20 7h-2.2A3 3 0 0 0 12 4.4 3 3 0 0 0 6.2 7H4a1 1 0 0 0-1 1v3h8V7h2v4h8V8a1 1 0 0 0-1-1zM9 7a1 1 0 1 1 1-1v1H9zm6 0h-1V6a1 1 0 1 1 1 1zM4 13v7a1 1 0 0 0 1 1h6v-8H4zm9 8h6a1 1 0 0 0 1-1v-7h-7v8z"/></symbol>
-</svg>
+<main class="chat">
+  <header class="topbar">
+    <span class="ava"><img src="icon.svg" alt=""><i class="dot" id="topDot" data-status="online"></i></span>
+    <h1>gus</h1>
+    <span class="top-status" id="topStatus">online</span>
+  </header>
 
-<div class="app" id="app">
-  <nav class="rail" aria-label="Servers">
-    <button class="rail-btn home active" type="button" title="Direct messages" aria-label="Direct messages"><svg><use href="#i-chat"/></svg></button>
-    <div class="rail-sep"></div>
-    <button class="rail-btn server" type="button" title="gus appreciation society (1 member)" data-toast="the gus appreciation society has one member and it's gus"><img src="icon.svg" alt=""></button>
-    <button class="rail-btn add" type="button" title="Add a server" data-toast="you don't have friends to make a server with 🫵"><svg><use href="#i-plus"/></svg></button>
-  </nav>
-
-  <aside class="sidebar" id="sidebar" aria-label="Direct messages">
-    <div class="side-top"><button class="search" type="button" data-toast="there's nobody else to find. it's just gus">Find or start a conversation</button></div>
-    <div class="side-scroll">
-      <button class="side-item" type="button" data-toast="0 friends online. 0 friends total 💀"><svg><use href="#i-people"/></svg>Friends</button>
-      <div class="dm-head">Direct Messages <svg><use href="#i-plus"/></svg></div>
-      <ul class="dms">
-        <li><button class="dm active" type="button" id="dmGus">
-          <span class="ava"><img src="icon.svg" alt=""><i class="dot" data-status="online"></i></span>
-          <span class="dm-text"><b>gus</b><small id="dmGusSub">right about everything</small></span>
-        </button></li>
-        <li><button class="dm off" type="button" data-toast="mom is offline. she's ignoring you too 😭">
-          <span class="ava ava-letter" style="--c:#e67e22">M<i class="dot" data-status="offline"></i></span>
-          <span class="dm-text"><b>mom</b><small>offline</small></span>
-        </button></li>
-        <li><button class="dm off" type="button" data-toast="the group chat muted you in 2024">
-          <span class="ava ava-letter" style="--c:#3ba55d">G</span>
-          <span class="dm-text"><b>the group chat</b><small>3 members · muted you</small></span>
-        </button></li>
-      </ul>
+  <div class="scroller" id="scroller">
+    <div class="inner">
+      <div class="intro">
+        <img class="intro-ava" src="icon.svg" alt="">
+        <h2>gus</h2>
+        <p>This is the beginning of your direct message history with <b>gus</b>.</p>
+      </div>
+      <div class="loader" id="loader">
+        <p class="loader-line" id="loaderLine">checking if gus is already here…</p>
+        <div class="bar"><div id="barFill"></div></div>
+        <p class="loader-sub" id="loaderSub"></p>
+        <button id="download" class="btn" type="button" hidden></button>
+      </div>
+      <ol class="messages" id="messages" aria-live="polite"></ol>
     </div>
-    <div class="me">
-      <span class="ava ava-letter me-ava" style="--c:#5865f2">Y<i class="dot" data-status="online"></i></span>
-      <span class="me-text"><b>you</b><small>online</small></span>
-      <button class="icon-btn" type="button" title="Mute" data-toast="you can't mute gus"><svg><use href="#i-mic"/></svg></button>
-      <button class="icon-btn" type="button" title="Deafen" data-toast="you can't unhear gus"><svg><use href="#i-headset"/></svg></button>
-      <button class="icon-btn" type="button" title="Settings" data-toast="settings: gus is always right. that's the only setting"><svg><use href="#i-gear"/></svg></button>
-    </div>
-  </aside>
-  <div class="scrim" id="scrim"></div>
+  </div>
 
-  <main class="main">
-    <header class="topbar">
-      <button class="icon-btn menu" id="menuBtn" type="button" aria-label="Open direct messages"><svg><use href="#i-menu"/></svg></button>
-      <svg class="at"><use href="#i-at"/></svg>
-      <span class="ava tiny"><img src="icon.svg" alt=""><i class="dot" id="topDot" data-status="online"></i></span>
-      <h1>gus</h1>
-      <span class="top-status" id="topStatus">right about everything</span>
-      <span class="spacer"></span>
-      <button class="icon-btn" type="button" title="Start voice call" data-toast="gus declined. he said your voice is probably mid"><svg><use href="#i-phone"/></svg></button>
-      <button class="icon-btn hide-sm" type="button" title="Start video call" data-toast="gus declined. he's not ready to see that"><svg><use href="#i-video"/></svg></button>
-      <button class="icon-btn hide-sm" type="button" title="Pinned messages" data-toast="nothing you said was worth pinning"><svg><use href="#i-pin"/></svg></button>
-      <button class="icon-btn" id="profileBtn" type="button" title="Show user profile" aria-pressed="true"><svg><use href="#i-profile"/></svg></button>
-    </header>
-
-    <div class="content">
-      <section class="chat-col">
-        <div class="scroller" id="scroller">
-          <div class="intro">
-            <img class="intro-ava" src="icon.svg" alt="">
-            <h2>gus</h2>
-            <p class="handle">gus.real</p>
-            <p>This is the beginning of your direct message history with <b>gus</b>.</p>
-          </div>
-          <div class="loader" id="loader">
-            <p class="loader-line" id="loaderLine">checking if gus is already here…</p>
-            <div class="bar"><div id="barFill"></div></div>
-            <p class="loader-sub" id="loaderSub"></p>
-            <button id="download" class="btn" type="button" hidden></button>
-          </div>
-          <ol class="messages" id="messages" aria-live="polite"></ol>
-        </div>
-
-        <form class="composer" id="form" autocomplete="off">
-          <div class="box">
-            <button class="icon-btn round" type="button" title="Upload" data-toast="gus doesn't open attachments from people like you"><svg><use href="#i-plus"/></svg></button>
-            <input id="input" type="text" placeholder="Message @gus" maxlength="400" disabled enterkeyhint="send" aria-label="Message gus">
-            <button class="icon-btn hide-sm" type="button" title="Gift" data-toast="you can't buy gus's respect"><svg><use href="#i-gift"/></svg></button>
-            <button class="icon-btn" id="emojiBtn" type="button" title="Emoji" aria-expanded="false"><svg><use href="#i-smile"/></svg></button>
-          </div>
-          <div class="picker" id="picker" hidden></div>
-        </form>
-        <div class="typing" id="typing"><span class="tdots" aria-hidden="true"><i></i><i></i><i></i></span><b>gus</b>&nbsp;is typing…</div>
-      </section>
-
-      <aside class="profile" id="profile" aria-label="gus's profile">
-        <div class="banner"></div>
-        <div class="p-ava"><img src="icon.svg" alt=""><i class="dot big" id="profDot" data-status="online"></i></div>
-        <div class="p-card">
-          <h3>gus</h3>
-          <p class="handle">gus.real</p>
-          <p class="custom" id="profStatus">right about everything</p>
-          <div class="p-sec">
-            <h4>About Me</h4>
-            <p>it's expresso. cereal is soup. a hot dog is a sandwich. i will not be taking questions 🗿</p>
-          </div>
-          <div class="p-sec">
-            <h4>Member Since</h4>
-            <p>Nov 25, 2026</p>
-          </div>
-          <div class="p-sec">
-            <h4>Note</h4>
-            <p class="muted">"lives in your browser. runs offline. can't be blocked."</p>
-          </div>
-        </div>
-      </aside>
-    </div>
-  </main>
-</div>
-<div class="toast" id="toast" role="status" hidden></div>
+  <div class="bottom">
+    <form class="composer" id="form" autocomplete="off">
+      <div class="box">
+        <input id="input" type="text" placeholder="Message @gus" maxlength="400" disabled enterkeyhint="send" aria-label="Message gus">
+        <button class="emoji-btn" id="emojiBtn" type="button" title="Emoji" aria-label="Emoji" aria-expanded="false">
+          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM8.5 8.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm7 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zM12 18a6 6 0 0 1-5.2-3h10.4A6 6 0 0 1 12 18z"/></svg>
+        </button>
+      </div>
+      <div class="picker" id="picker" hidden></div>
+    </form>
+    <div class="typing" id="typing"><span class="tdots" aria-hidden="true"><i></i><i></i><i></i></span><b>gus</b>&nbsp;is typing…</div>
+  </div>
+</main>
 <script type="module" src="app.js"></script>
 </body>
 </html>

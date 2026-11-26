@@ -10,7 +10,7 @@ import { DOWNLOAD_MB } from './config.js';
 // ---------------------------------------------------------------------------------------------
 
 const $ = (id) => document.getElementById(id);
-const app = $('app'), list = $('messages'), scroller = $('scroller'), input = $('input');
+const list = $('messages'), scroller = $('scroller'), input = $('input');
 const rand = (a, b) => a + Math.random() * (b - a);
 const chance = (p) => Math.random() < p;
 const pick = (xs) => xs[Math.floor(Math.random() * xs.length)];
@@ -150,19 +150,16 @@ function react(li, emoji) {
   if (stick) scroller.scrollTop = scroller.scrollHeight;
 }
 
-const typingEl = $('typing'), dmSub = $('dmGusSub');
-const status = { text: 'right about everything' };
+const typingEl = $('typing');
+const status = { text: 'online' };
 function setTyping(on) {
   typingEl.classList.toggle('on', on);
-  dmSub.textContent = on ? 'typing…' : status.text;
-  dmSub.classList.toggle('typing-now', on);
+  $('topStatus').textContent = on ? 'typing…' : status.text;
 }
 function setStatus(kind) {
-  for (const id of ['topDot', 'profDot']) $(id).dataset.status = kind;
-  document.querySelector('#dmGus .dot').dataset.status = kind;
-  status.text = kind === 'idle' ? 'idle · sulking' : 'right about everything';
-  $('topStatus').textContent = $('profStatus').textContent = status.text;
-  if (!typingEl.classList.contains('on')) dmSub.textContent = status.text;
+  $('topDot').dataset.status = kind;
+  status.text = kind === 'idle' ? 'idle' : 'online';
+  if (!typingEl.classList.contains('on')) $('topStatus').textContent = status.text;
 }
 
 // ---------- how a person types ----------
@@ -383,28 +380,4 @@ for (const e of PICKER) {
 function closePicker() { picker.hidden = true; emojiBtn.setAttribute('aria-expanded', 'false'); }
 emojiBtn.onclick = () => { picker.hidden = !picker.hidden; emojiBtn.setAttribute('aria-expanded', String(!picker.hidden)); };
 document.addEventListener('click', (e) => { if (!picker.hidden && !picker.contains(e.target) && !emojiBtn.contains(e.target)) closePicker(); });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closePicker(); app.classList.remove('drawer'); } });
-
-// ---------- chrome: drawer, profile, toasts ----------
-$('menuBtn').onclick = () => app.classList.add('drawer');
-$('scrim').onclick = () => app.classList.remove('drawer');
-$('dmGus').onclick = () => app.classList.remove('drawer');
-// The profile panel sits beside the chat on wide screens and is an overlay you open on narrow ones.
-const profileBtn = $('profileBtn');
-const syncProfile = () => profileBtn.setAttribute('aria-pressed', String(app.classList.contains('show-profile')));
-const wide = matchMedia('(min-width: 1181px)');
-const fitProfile = () => { app.classList.toggle('show-profile', wide.matches); syncProfile(); };
-wide.addEventListener('change', fitProfile);
-fitProfile();
-profileBtn.onclick = () => { app.classList.toggle('show-profile'); syncProfile(); };
-
-let toastTimer = 0;
-document.addEventListener('click', (e) => {
-  const el = e.target.closest('[data-toast]');
-  if (!el) return;
-  const t = $('toast');
-  t.textContent = el.dataset.toast;
-  t.hidden = false;
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { t.hidden = true; }, 2600);
-});
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePicker(); });
